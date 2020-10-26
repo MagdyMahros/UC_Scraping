@@ -3,6 +3,10 @@ import re
 import time
 from pathlib import Path
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 import bs4 as bs4
 import os
 import copy
@@ -27,7 +31,7 @@ csv_file = csv_file_path.__str__() + '/UC_bachelors.csv'
 course_data = {'Level_Code': '', 'University': 'University of Canberra', 'City': '', 'Country': 'Australia',
                'Course': '', 'Int_Fees': '', 'Local_Fees': '', 'Currency': 'AUD', 'Currency_Time': 'year',
                'Duration': '', 'Duration_Time': '', 'Full_Time': '', 'Part_Time': '', 'Prerequisite_1': '',
-               'Prerequisite_2': 'IELTS', 'Prerequisite_3': '', 'Prerequisite_1_grade': '', 'Prerequisite_2_grade': '',
+               'Prerequisite_2': 'IELTS', 'Prerequisite_3': '', 'Prerequisite_1_grade': '', 'Prerequisite_2_grade': '6.0',
                'Prerequisite_3_grade': '', 'Website': '', 'Course_Lang': '', 'Availability': '', 'Description': '',
                'Career_Outcomes': '', 'Online': '', 'Offline': '', 'Distance': '', 'Face_to_Face': '',
                'Blended': '', 'Remarks': ''}
@@ -111,6 +115,29 @@ for each_url in course_links_file:
             course_data['Prerequisite_1'] = 'year 12'
             course_data['Remarks'] = 'The university did not announce the selection rank(ATAR) yet'
         print('ATAR: ', course_data['Prerequisite_1_grade'])
+
+    # FEES
+    # navigate to fees tab
+    try:
+        browser.execute_script("arguments[0].click();", WebDriverWait(browser, 5).until(
+            EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, 'Fees'))))
+    except TimeoutException:
+        print('Timeout Exception')
+        pass
+    # grab the data
+    year_table_row = soup.find('div', id='fees').find_next('table', class_='short-table grey').find_all('tr')
+    if year_table_row:
+        for x in year_table_row:
+            fees = x.find('td', text=re.compile('2021', re.IGNORECASE)) #.find_next_siblings('td')
+            if fees:
+                for index, fee in enumerate(fees.find_next_siblings('td')):
+                    if index == 0:
+                        course_data['Local_Fees'] = fee.get_text().__str__().strip().replace('$', '')
+                    if index == 1:
+                        course_data['Int_Fees'] = fee.get_text().__str__().strip().replace('$', '')
+        print('LOCAL FEES: ', course_data['Local_Fees'])
+        print('INTERNATIONAL FEES: ', course_data['Int_Fees'])
+
 
 
 
