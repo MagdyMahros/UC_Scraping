@@ -81,13 +81,21 @@ for each_url in course_links_file:
         print('COURSE DESCRIPTION: ', description.get_text())
         course_data['Description'] = description.get_text()
 
-        # COURSE LANGUAGE
-        for language in possible_languages:
-            if language in course_data['Course']:
-                course_data['Course_Lang'] = language
-            else:
-                course_data['Course_Lang'] = 'English'
-        print('COURSE LANGUAGE: ', course_data['Course_Lang'])
+     # COURSE LANGUAGE
+    for language in possible_languages:
+        if language in course_data['Course']:
+            course_data['Course_Lang'] = language
+        else:
+            course_data['Course_Lang'] = 'English'
+    print('COURSE LANGUAGE: ', course_data['Course_Lang'])
+
+    # CITY
+    location_head = soup.find('th', class_='course-details-table__th', text=re.compile('Location', re.IGNORECASE))
+    if location_head:
+        cities = location_head.find_next('td', class_='course-details-table__td').text
+        actual_cities.append(cities.__str__().strip().lower())
+        print('CITY: ', actual_cities)
+
 
 
 
