@@ -4,10 +4,6 @@ import time
 from pathlib import Path
 from selenium import webdriver
 import bs4 as bs4
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
 import os
 import copy
 from CustomMethods import TemplateData
@@ -60,6 +56,23 @@ for each_url in course_links_file:
     course_title = soup.find('h1', class_='course_title').text
     print('COURSE TITLE: ', course_title)
     course_data['Course'] = course_title.strip()
+
+    # DECIDE THE LEVEL CODE
+    for i in level_key:
+        for j in level_key[i]:
+            if j in course_data['Course']:
+                course_data['Level_Code'] = i
+    print('COURSE LEVEL CODE: ', course_data['Level_Code'])
+
+    # DECIDE THE FACULTY
+    for i in faculty_key:
+        for j in faculty_key[i]:
+            if j.lower() in course_data['Course'].lower():
+                course_data['Faculty'] = i
+    print('COURSE FACULTY: ', course_data['Faculty'])
+
+
+
 
 
 
