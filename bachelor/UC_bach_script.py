@@ -35,6 +35,9 @@ course_data = {'Level_Code': '', 'University': 'Australian Catholic University',
 possible_cities = {'canberra': 'Canberra', 'bruce': 'Bruce', 'mumbai': 'Mumbai', 'melbourne': 'Melbourne',
                    'brisbane': 'Brisbane', 'sydney': 'Sydney'}
 
+possible_languages = {'Japanese': 'Japanese', 'French': 'French', 'Italian': 'Italian', 'Korean': 'Korean',
+                      'Indonesian': 'Indonesian', 'Chinese': 'Chinese', 'Spanish': 'Spanish'}
+
 course_data_all = []
 level_key = TemplateData.level_key  # dictionary of course levels
 faculty_key = TemplateData.faculty_key  # dictionary of course levels
@@ -77,6 +80,15 @@ for each_url in course_links_file:
         description = d_title.find('p')
         print('COURSE DESCRIPTION: ', description.get_text())
         course_data['Description'] = description.get_text()
+
+        # COURSE LANGUAGE
+        for language in possible_languages:
+            if language in course_data['Course']:
+                course_data['Course_Lang'] = language
+            else:
+                course_data['Course_Lang'] = 'English'
+        print('COURSE LANGUAGE: ', course_data['Course_Lang'])
+
 
 
 
