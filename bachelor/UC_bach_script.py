@@ -71,6 +71,12 @@ for each_url in course_links_file:
                 course_data['Faculty'] = i
     print('COURSE FACULTY: ', course_data['Faculty'])
 
+    # COURSE DESCRIPTION
+    d_title = soup.find('div', id='introduction')
+    if d_title:
+        description = d_title.find('p')
+        print('COURSE DESCRIPTION: ', description.get_text())
+        course_data['Description'] = description.get_text()
 
 
 
