@@ -116,6 +116,15 @@ for each_url in course_links_file:
             course_data['Remarks'] = 'The university did not announce the selection rank(ATAR) yet'
         print('ATAR: ', course_data['Prerequisite_1_grade'])
 
+    # CAREER OPPORTUNITIES
+    career_title = soup.find('h2', text=re.compile('Career opportunities', re.IGNORECASE))
+    if career_title:
+        career_list = career_title.find_next('ul')
+        if career_list:
+            career_list = career_list.get_text().__str__().strip().replace('\n', ' / ')
+            course_data['Career_Outcomes'] = career_list
+    print('CAREER OUTCOMES: ', course_data['Career_Outcomes'])
+
     # FEES
     # navigate to fees tab
     try:
