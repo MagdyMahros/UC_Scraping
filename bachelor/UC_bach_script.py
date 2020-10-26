@@ -24,12 +24,12 @@ course_links_file = open(course_links_file_path, 'r')
 csv_file_path = Path(os.getcwd().replace('\\', '/'))
 csv_file = csv_file_path.__str__() + '/UC_bachelors.csv'
 
-course_data = {'Level_Code': '', 'University': 'Australian Catholic University', 'City': '', 'Country': 'Australia',
+course_data = {'Level_Code': '', 'University': 'University of Canberra', 'City': '', 'Country': 'Australia',
                'Course': '', 'Int_Fees': '', 'Local_Fees': '', 'Currency': 'AUD', 'Currency_Time': 'year',
                'Duration': '', 'Duration_Time': '', 'Full_Time': '', 'Part_Time': '', 'Prerequisite_1': '',
                'Prerequisite_2': 'IELTS', 'Prerequisite_3': '', 'Prerequisite_1_grade': '', 'Prerequisite_2_grade': '',
                'Prerequisite_3_grade': '', 'Website': '', 'Course_Lang': '', 'Availability': '', 'Description': '',
-               'Career_Outcomes': '', 'Online': 'no', 'Offline': 'yes', 'Distance': 'no', 'Face_to_Face': 'yes',
+               'Career_Outcomes': '', 'Online': '', 'Offline': '', 'Distance': '', 'Face_to_Face': '',
                'Blended': '', 'Remarks': ''}
 
 possible_cities = {'canberra': 'Canberra', 'bruce': 'Bruce', 'mumbai': 'Mumbai', 'melbourne': 'Melbourne',
@@ -96,7 +96,21 @@ for each_url in course_links_file:
         actual_cities.append(cities.__str__().strip().lower())
         print('CITY: ', actual_cities)
 
-
+    # PREREQUISITE & ATAR
+    rank_head = soup.find('th', class_='course-details-table__th', text=re.compile('Selection Rank', re.IGNORECASE))
+    if rank_head:
+        atar = rank_head.find_next('td', class_='course-details-table__td').text
+        atar_val = re.search(r'\d+', atar.__str__().strip())
+        if atar_val != None:
+            atar_val = atar_val.group()
+            course_data['Prerequisite_1_grade'] = atar_val
+            course_data['Prerequisite_1'] = 'year 12'
+        else:
+            atar_val = 'Not Available'
+            course_data['Prerequisite_1_grade'] = atar_val
+            course_data['Prerequisite_1'] = 'year 12'
+            course_data['Remarks'] = 'The university did not announce the selection rank(ATAR) yet'
+        print('ATAR: ', course_data['Prerequisite_1_grade'])
 
 
 
