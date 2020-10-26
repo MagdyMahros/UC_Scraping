@@ -11,6 +11,7 @@ import bs4 as bs4
 import os
 import copy
 from CustomMethods import TemplateData
+from CustomMethods import  DurationConverter
 
 option = webdriver.ChromeOptions()
 option.add_argument(" - incognito")
@@ -147,8 +148,32 @@ for each_url in course_links_file:
         print('LOCAL FEES: ', course_data['Local_Fees'])
         print('INTERNATIONAL FEES: ', course_data['Int_Fees'])
 
-
-
+    # DURATION & DURATION TIME
+    # navigate to "important to know" tab
+    try:
+        browser.execute_script("arguments[0].click();", WebDriverWait(browser, 5).until(
+            EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, 'Important to know'))))
+    except TimeoutException:
+        print('Timeout Exception')
+        pass
+    # grab the data
+    duration_title = soup.find('h2', class_='h4 blue', text=re.compile('Course Duration', re.IGNORECASE))
+    if duration_title:
+        duration_text = duration_title.find_next('p')
+        if duration_text:
+            first_part = duration_text.get_text().__str__().split('.')[0]
+            converted_first_part = DurationConverter.convert_duration(first_part)
+            course_data['Duration'] = converted_first_part[0]
+            if converted_first_part[0] == 1 and 'Years' in converted_first_part[1]:
+                converted_first_part[1] = 'Year'
+                course_data['Duration_Time'] = converted_first_part[1]
+            elif converted_first_part[0] == 1 and 'Months' in converted_first_part[1]:
+                converted_first_part[1] = 'Month'
+                course_data['Duration_Time'] = converted_first_part[1]
+            else:
+                course_data['Duration_Time'] = converted_first_part[1]
+    print('DURATION: ', course_data['Duration'])
+    print('DURATION TIME: ', course_data['Duration_Time'])
 
 
 
