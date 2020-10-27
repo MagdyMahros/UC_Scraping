@@ -29,16 +29,18 @@ course_links_file = open(course_links_file_path, 'r')
 csv_file_path = Path(os.getcwd().replace('\\', '/'))
 csv_file = csv_file_path.__str__() + '/UC_bachelors.csv'
 
-course_data = {'Level_Code': '', 'University': 'University of Canberra', 'City': '', 'Country': 'Australia',
+course_data = {'Level_Code': '', 'University': 'University of Canberra', 'City': '', 'Country': '',
                'Course': '', 'Int_Fees': '', 'Local_Fees': '', 'Currency': 'AUD', 'Currency_Time': 'year',
-               'Duration': '', 'Duration_Time': '', 'Full_Time': '', 'Part_Time': '', 'Prerequisite_1': '',
+               'Duration': '', 'Duration_Time': '', 'Full_Time': 'yes', 'Part_Time': 'yes', 'Prerequisite_1': '',
                'Prerequisite_2': 'IELTS', 'Prerequisite_3': '', 'Prerequisite_1_grade': '', 'Prerequisite_2_grade': '6.0',
-               'Prerequisite_3_grade': '', 'Website': '', 'Course_Lang': '', 'Availability': '', 'Description': '',
+               'Prerequisite_3_grade': '', 'Website': '', 'Course_Lang': '', 'Availability': 'A', 'Description': '',
                'Career_Outcomes': '', 'Online': '', 'Offline': '', 'Distance': '', 'Face_to_Face': '',
                'Blended': '', 'Remarks': ''}
 
 possible_cities = {'canberra': 'Canberra', 'bruce': 'Bruce', 'mumbai': 'Mumbai', 'melbourne': 'Melbourne',
                    'brisbane': 'Brisbane', 'sydney': 'Sydney'}
+possible_countries = {'canberra': 'Australia', 'bruce': 'Australia', 'mumbai': 'India', 'melbourne': 'Australia',
+                      'brisbane': 'Australia', 'sydney': 'Australia'}
 
 possible_languages = {'Japanese': 'Japanese', 'French': 'French', 'Italian': 'Italian', 'Korean': 'Korean',
                       'Indonesian': 'Indonesian', 'Chinese': 'Chinese', 'Spanish': 'Spanish'}
@@ -174,6 +176,54 @@ for each_url in course_links_file:
                 course_data['Duration_Time'] = converted_first_part[1]
     print('DURATION: ', course_data['Duration'])
     print('DURATION TIME: ', course_data['Duration_Time'])
+
+    # DELIVERY (online, offline, face-to-face, blended, distance)
+    # navigate to "Unit Delivery Modes" tab
+    try:
+        browser.execute_script("arguments[0].click();", WebDriverWait(browser, 5).until(
+            EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, 'Unit Delivery Modes'))))
+    except TimeoutException:
+        print('Timeout Exception')
+        pass
+    # grab the data
+    delivery_tag = soup.find('div', id='unit_delivery_modes')
+    delivery_list = []
+    if delivery_tag:
+        delivery_tag2 = delivery_tag.find_next('div', class_='collapsible-section__details')
+        if delivery_tag2:
+            delivery_table = delivery_tag2.find('table', class_='unit-delivery-mode')
+            if delivery_table:
+                table_rows = delivery_table.find_all('tr')
+                if table_rows:
+                    for column in table_rows:
+                        table_columns = column.find_all('td')
+                        for index, element in enumerate(table_columns):
+                            if index == 0:
+                                delivery_unit = element.get_text().__str__().strip().lower().replace(':', '')
+                                delivery_list.append(delivery_unit)
+                                if 'flexible' in delivery_list:
+                                    course_data['Blended'] = 'yes'
+                                    course_data['Face_to_Face'] = 'yes'
+                                else:
+                                    course_data['Blended'] = 'no'
+                                if 'online' in delivery_list:
+                                    course_data['Online'] = 'yes'
+                                else:
+                                    course_data['Online'] = 'no'
+                                if 'on campus' in delivery_list:
+                                    course_data['Offline'] = 'yes'
+                                    course_data['Face_to_Face'] = 'yes'
+                                else:
+                                    course_data['Offline'] = 'no'
+                                    course_data['Face_to_Face'] = 'no'
+                                if 'distance' in delivery_list:
+                                    course_data['Distance'] = 'yes'
+                                else:
+                                    course_data['Distance'] = 'no'
+    print('DELIVERY: online: ' + course_data['Online'] + ' offline: ' + course_data['Offline'] + ' face to face: ' +
+          course_data['Face_to_Face'] + ' blended: ' + course_data['Blended'] + ' distance: ' + course_data['Distance'])
+
+
 
 
 
