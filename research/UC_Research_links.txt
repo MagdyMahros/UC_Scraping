@@ -1,0 +1,16 @@
+https://www.canberra.edu.au/coursesandunits/course?course_cd=303JA&version_number=1&title=Master-of-Applied-Arts---Humanities-(Research)&location=BRUCE&rank=FFF&faculty=Faculty-of-Arts-and-Design&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=910AA&version_number=2&title=Master-of-Applied-Science-(Research)&location=BRUCE&rank=FFF&faculty=Faculty-of-Science-and-Technology&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=920AA&version_number=2&title=Master-of-Arts-in-Government-(Research)&location=BRUCE&rank=FFF&faculty=Faculty-of-Business,-Government---Law&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=327AA&version_number=4&title=Master-of-Arts-in-Tourism-(Research)&location=BRUCE&rank=FFF&faculty=Faculty-of-Business,-Government---Law&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=859AA&version_number=2&title=Master-of-Business-(Research)&location=BRUCE&rank=FFF&faculty=Faculty-of-Business,-Government---Law&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=927AA&version_number=2&title=Master-of-Education-(Research)&location=BRUCE&rank=FFF&faculty=Faculty-of-Education&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=135JA&version_number=2&title=Master-of-Health-(Research)&location=BRUCE&rank=FFF&faculty=Faculty-of-Health&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=861AA&version_number=2&title=Master-of-Information-Sciences-(Research)&location=BRUCE&rank=FFF&faculty=Faculty-of-Science-and-Technology&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=942AA&version_number=1&title=Master-of-Law-(Research)&location=BRUCE&rank=FFF&faculty=Faculty-of-Business,-Government---Law&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=MXP001&version_number=1&title=Doctor-of-Philosophy&location=BRUCE&rank=GGG&faculty=Graduate-Research-Office&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=958AA&version_number=2&title=Doctor-of-Philosophy-in-Clinical-Psychology&location=BRUCE&rank=GGG&faculty=Faculty-of-Health&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=380JA&version_number=1&title=Professional-Doctorate-in-Business-Administration-(Research)&location=BRUCE&rank=GGG&faculty=Faculty-of-Business,-Government---Law&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=380JB&version_number=1&title=Professional-Doctorate-in-Business-Administration-(Research)-(Singapore)&location=UNIASIA&rank=GGG&faculty=Faculty-of-Business,-Government---Law&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=384JA&version_number=1&title=Professional-Doctorate-in-Legal-Science-(Research)&location=BRUCE&rank=GGG&faculty=Faculty-of-Business,-Government---Law&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=253JA&version_number=3&title=Professional-Doctorate-in-Nurse-Practitioner-(Research)&location=BRUCE&rank=GGG&faculty=Faculty-of-Health&year=2021
+https://www.canberra.edu.au/coursesandunits/course?course_cd=385JA&version_number=1&title=Professional-Doctorate-in-Public-Administration-(Research)&location=BRUCE&rank=GGG&faculty=Faculty-of-Business,-Government---Law&year=2021

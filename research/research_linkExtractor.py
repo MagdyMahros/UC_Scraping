@@ -22,7 +22,7 @@ exec_path = exec_path.parent.__str__() + '/Libraries/Google/v86/chromedriver.exe
 browser = webdriver.Chrome(executable_path=exec_path, options=option)
 
 # MAIN ROUTINE
-courses_page_url = 'https://search.canberra.edu.au/s/search.html?collection=courses&form=course-search&profile=_default&query=!padre&course-search-widget__submit=&meta_C_and=COURSE&sort=metaH&f.Type|B=undergraduate'
+courses_page_url = 'https://search.canberra.edu.au/s/search.html?collection=courses&form=course-search&profile=_default&query=!padre&course-search-widget__submit=&meta_C_and=COURSE&sort=metaH&f.Type|B=research&start_rank=1'
 list_of_links = []
 browser.get(courses_page_url)
 the_url = browser.page_source
@@ -43,7 +43,7 @@ while condition:
         print('timeout')
         condition = False
 # SAVE TO FILE
-course_links_file_path = os.getcwd().replace('\\', '/') + '/UC_Bachelor_links.txt'
+course_links_file_path = os.getcwd().replace('\\', '/') + '/UC_Research_links.txt'
 course_links_file = open(course_links_file_path, 'w')
 for link in list_of_links:
     if link is not None and link != "" and link != "\n":
