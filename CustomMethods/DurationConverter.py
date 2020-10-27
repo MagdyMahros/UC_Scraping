@@ -26,7 +26,7 @@ def convert_duration(duration):
     # but only if it has the word "semester" in it.
     dur_type_list = []
     for word in duration.split():
-        if 'semester' in word.lower() or 'term' in word.lower() or 'hour' in word.lower() or 'day' in word.lower() or 'week' in word.lower() or 'month' in word.lower() or 'year' in word.lower():
+        if 'semester' in word.lower() or 'term' in word.lower() or 'hour' in word.lower() or 'day' in word.lower() or 'week' in word.lower() or 'month' in word.lower() or 'year' in word.lower() or 'period' in word.lower():
             dur_type_list.append(word)  # put each word of the duration into the list
 
     # put all numbers contained in the duration in this list
@@ -70,6 +70,8 @@ def convert_duration(duration):
             elif 'trimester' in dur:
                 return convert_duration(str(int(number) * 3) + 'month')
             elif 'term' in dur:
+                return convert_duration(str(int(number) * 6) + 'month')
+            elif 'period' in dur:  # strange huh! yes i found this in one of the universities
                 return convert_duration(str(int(number) * 6) + 'month')
             elif 'day' in dur:
                 if '.' in number:

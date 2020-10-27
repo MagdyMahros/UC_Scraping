@@ -38,9 +38,9 @@ course_data = {'Level_Code': '', 'University': 'University of Canberra', 'City':
                'Blended': '', 'Remarks': ''}
 
 possible_cities = {'canberra': 'Canberra', 'bruce': 'Bruce', 'mumbai': 'Mumbai', 'melbourne': 'Melbourne',
-                   'brisbane': 'Brisbane', 'sydney': 'Sydney'}
-possible_countries = {'canberra': 'Australia', 'bruce': 'Australia', 'mumbai': 'India', 'melbourne': 'Australia',
-                      'brisbane': 'Australia', 'sydney': 'Australia'}
+                   'brisbane': 'Brisbane', 'sydney': 'Sydney', 'queensland': 'Queensland'}
+possible_countries = {'canberra': 'Australia', 'mumbai': 'India', 'melbourne': 'Australia',
+                      'brisbane': 'Australia', 'sydney': 'Australia', 'queensland': 'Australia'}
 
 possible_languages = {'Japanese': 'Japanese', 'French': 'French', 'Italian': 'Italian', 'Korean': 'Korean',
                       'Indonesian': 'Indonesian', 'Chinese': 'Chinese', 'Spanish': 'Spanish'}
@@ -85,8 +85,13 @@ for each_url in course_links_file:
     d_title = soup.find('div', id='introduction')
     if d_title:
         description = d_title.find('p')
-        print('COURSE DESCRIPTION: ', description.get_text())
-        course_data['Description'] = description.get_text()
+        if description:
+            print('COURSE DESCRIPTION: ', description.get_text())
+            course_data['Description'] = description.get_text()
+        elif description is None:
+            description_1 = d_title.find('div')
+            print('COURSE DESCRIPTION: ', description_1.get_text())
+            course_data['Description'] = description_1.get_text()
 
      # COURSE LANGUAGE
     for language in possible_languages:
@@ -104,22 +109,25 @@ for each_url in course_links_file:
         temp_city = re.findall(r"[\w']+", cities.__str__().strip().lower())
         if 'canberra' in temp_city:
             actual_cities.append('canberra')
-        if 'bruce' in temp_city or 'bruceuci' in temp_city:
-            actual_cities.append('bruce')
         if 'mumbai' in temp_city:
             actual_cities.append('mumbai')
         if 'melbourne' in temp_city:
             actual_cities.append('melbourne')
-        if 'brisbane' in temp_city:
+        if 'brisbane' in temp_city or 'south' in temp_city:
             actual_cities.append('brisbane')
         if 'sydney' in temp_city:
             actual_cities.append('sydney')
+        if 'queensland' in temp_city:
+            actual_cities.append('queensland')
+    else:
+        actual_cities.append('canberra')
 
         print('CITY: ', actual_cities)
 
     # PREREQUISITE & ATAR
     rank_head = soup.find('th', class_='course-details-table__th', text=re.compile('Selection Rank', re.IGNORECASE))
     if rank_head:
+        remarks_list = []
         atar = rank_head.find_next('td', class_='course-details-table__td').text
         atar_val = re.search(r'\d+', atar.__str__().strip())
         if atar_val != None:
@@ -130,8 +138,10 @@ for each_url in course_links_file:
             atar_val = 'Not Available'
             course_data['Prerequisite_1_grade'] = atar_val
             course_data['Prerequisite_1'] = 'year 12'
-            course_data['Remarks'] = 'The university did not announce the selection rank(ATAR) yet'
+            remarks_list.append('The university did not announce the selection rank(ATAR) yet')
+            course_data['Remarks'] = remarks_list
         print('ATAR: ', course_data['Prerequisite_1_grade'])
+
 
     # CAREER OPPORTUNITIES
     career_title = soup.find('h2', text=re.compile('Career opportunities', re.IGNORECASE))
@@ -151,10 +161,11 @@ for each_url in course_links_file:
         print('Timeout Exception')
         pass
     # grab the data
-    year_table_row = soup.find('div', id='fees').find_next('table', class_='short-table grey').find_all('tr')
-    if year_table_row:
+    year_table = soup.find('div', id='fees').find_next('table', class_='short-table grey')
+    if year_table:
+        year_table_row = year_table.find_all('tr')
         for x in year_table_row:
-            fees = x.find('td', text=re.compile('2021', re.IGNORECASE)) #.find_next_siblings('td')
+            fees = x.find('td', text=re.compile('2021', re.IGNORECASE))
             if fees:
                 for index, fee in enumerate(fees.find_next_siblings('td')):
                     if index == 0:
@@ -178,18 +189,24 @@ for each_url in course_links_file:
         duration_text = duration_title.find_next('p')
         if duration_text:
             first_part = duration_text.get_text().__str__().split('.')[0]
-            converted_first_part = DurationConverter.convert_duration(first_part)
-            course_data['Duration'] = converted_first_part[0]
-            if converted_first_part[0] == 1 and 'Years' in converted_first_part[1]:
-                converted_first_part[1] = 'Year'
-                course_data['Duration_Time'] = converted_first_part[1]
-            elif converted_first_part[0] == 1 and 'Months' in converted_first_part[1]:
-                converted_first_part[1] = 'Month'
-                course_data['Duration_Time'] = converted_first_part[1]
-            else:
-                course_data['Duration_Time'] = converted_first_part[1]
+            if first_part is not None:
+                if DurationConverter.convert_duration(first_part) is not None:
+                    converted_first_part = list(DurationConverter.convert_duration(first_part))
+                    course_data['Duration'] = converted_first_part[0]
+                    if converted_first_part[0] == 1 and 'Years' in converted_first_part[1]:
+                        converted_first_part[1] = 'Year'
+                        course_data['Duration_Time'] = converted_first_part[1]
+                    elif converted_first_part[0] == 1 and 'Months' in converted_first_part[1]:
+                        converted_first_part[1] = 'Month'
+                        course_data['Duration_Time'] = converted_first_part[1]
+                    else:
+                        course_data['Duration_Time'] = converted_first_part[1]
+                else:
+                    course_data['Duration'] = 'not specified'
+                    course_data['Duration_Time'] = 'not specified'
     print('DURATION: ', course_data['Duration'])
     print('DURATION TIME: ', course_data['Duration_Time'])
+
 
     # DELIVERY (online, offline, face-to-face, blended, distance)
     # navigate to "Unit Delivery Modes" tab
@@ -236,6 +253,37 @@ for each_url in course_links_file:
                                     course_data['Distance'] = 'no'
     print('DELIVERY: online: ' + course_data['Online'] + ' offline: ' + course_data['Offline'] + ' face to face: ' +
           course_data['Face_to_Face'] + ' blended: ' + course_data['Blended'] + ' distance: ' + course_data['Distance'])
+
+    # duplicating entries with multiple cities for each city and mapping the corresponding country
+    for i in actual_cities:
+        course_data['City'] = possible_cities[i]
+        course_data['Country'] = possible_countries[i]
+        course_data_all.append(copy.deepcopy(course_data))
+    del actual_cities
+    del remarks_list
+    # TABULATE THE DATA
+    desired_order_list = ['Level_Code', 'University', 'City', 'Course', 'Faculty', 'Int_Fees', 'Local_Fees',
+                          'Currency', 'Currency_Time', 'Duration', 'Duration_Time', 'Full_Time', 'Part_Time',
+                          'Prerequisite_1', 'Prerequisite_2', 'Prerequisite_3', 'Prerequisite_1_grade',
+                          'Prerequisite_2_grade', 'Prerequisite_3_grade', 'Website', 'Course_Lang', 'Availability',
+                          'Description', 'Career_Outcomes', 'Country', 'Online', 'Offline', 'Distance', 'Face_to_Face',
+                          'Blended', 'Remarks']
+
+    course_dict_keys = set().union(*(d.keys() for d in course_data_all))
+
+    with open(csv_file, 'w', encoding='utf-8', newline='') as output_file:
+        dict_writer = csv.DictWriter(output_file, course_dict_keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(course_data_all)
+
+    with open(csv_file, 'r', encoding='utf-8') as infile, open('UC_bachelors_ordered.csv', 'w', encoding='utf-8',
+                                                               newline='') as outfile:
+        writer = csv.DictWriter(outfile, fieldnames=desired_order_list)
+        # reorder the header first
+        writer.writeheader()
+        for row in csv.DictReader(infile):
+            # writes the reordered rows to the new file
+            writer.writerow(row)
 
 
 
