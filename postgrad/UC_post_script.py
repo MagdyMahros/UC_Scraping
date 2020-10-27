@@ -22,18 +22,18 @@ browser = webdriver.Chrome(executable_path=exec_path, options=option)
 
 # read the url from each file into a list
 course_links_file_path = Path(os.getcwd().replace('\\', '/'))
-course_links_file_path = course_links_file_path.__str__() + '/UC_Bachelor_links.txt'
+course_links_file_path = course_links_file_path.__str__() + '/UC_postgrad_links.txt'
 course_links_file = open(course_links_file_path, 'r')
 
 # the csv file we'll be saving the courses to
 csv_file_path = Path(os.getcwd().replace('\\', '/'))
-csv_file = csv_file_path.__str__() + '/UC_bachelors.csv'
+csv_file = csv_file_path.__str__() + '/UC_postgrad.csv'
 
 course_data = {'Level_Code': '', 'University': 'University of Canberra', 'City': '', 'Country': '',
                'Course': '', 'Int_Fees': '', 'Local_Fees': '', 'Currency': 'AUD', 'Currency_Time': 'year',
-               'Duration': '', 'Duration_Time': '', 'Full_Time': 'yes', 'Part_Time': 'yes', 'Prerequisite_1': '',
-               'Prerequisite_2': 'IELTS', 'Prerequisite_3': '', 'Prerequisite_1_grade': '', 'Prerequisite_2_grade': '6.0',
-               'Prerequisite_3_grade': '', 'Website': '', 'Course_Lang': '', 'Availability': 'A', 'Description': '',
+               'Duration': '', 'Duration_Time': '', 'Full_Time': 'yes', 'Part_Time': 'yes', 'Prerequisite_1': 'IELTS',
+               'Prerequisite_2': '', 'Prerequisite_3': '', 'Prerequisite_1_grade': '6.5', 'Prerequisite_2_grade': '',
+               'Prerequisite_3_grade': '', 'Website': '', 'Course_Lang': '', 'Availability': '', 'Description': '',
                'Career_Outcomes': '', 'Online': '', 'Offline': '', 'Distance': '', 'Face_to_Face': '',
                'Blended': '', 'Remarks': ''}
 
@@ -97,7 +97,7 @@ for each_url in course_links_file:
             print('COURSE DESCRIPTION: ', description_1.get_text())
             course_data['Description'] = description_1.get_text()
 
-     # COURSE LANGUAGE
+    # COURSE LANGUAGE
     for language in possible_languages:
         if language in course_data['Course']:
             course_data['Course_Lang'] = language
@@ -113,50 +113,43 @@ for each_url in course_links_file:
         temp_city = re.findall(r"[\w']+", cities.__str__().strip().lower())
         if 'canberra' in temp_city:
             actual_cities.append('canberra')
+            course_data['Availability'] = 'A'
         if 'mumbai' in temp_city:
             actual_cities.append('mumbai')
+            course_data['Availability'] = 'I'
         if 'melbourne' in temp_city:
             actual_cities.append('melbourne')
         if 'brisbane' in temp_city or 'south' in temp_city:
             actual_cities.append('brisbane')
+            course_data['Availability'] = 'A'
         if 'sydney' in temp_city:
             actual_cities.append('sydney')
+            course_data['Availability'] = 'A'
         if 'queensland' in temp_city:
             actual_cities.append('queensland')
+            course_data['Availability'] = 'A'
         if 'ningbo' in temp_city:
             actual_cities.append('ningbo')
+            course_data['Availability'] = 'I'
         if 'shanghai' in temp_city:
             actual_cities.append('shanghai')
+            course_data['Availability'] = 'I'
         if 'bhutan' in temp_city:
             actual_cities.append('bhutan')
+            course_data['Availability'] = 'I'
         if 'online' in temp_city:
             actual_cities.append('online')
+            course_data['Availability'] = 'A'
         if 'hangzhou' in temp_city:
             actual_cities.append('hangzhou')
+            course_data['Availability'] = 'I'
         if 'hanoi' in temp_city:
             actual_cities.append('hanoi')
+            course_data['Availability'] = 'I'
     else:
         actual_cities.append('canberra')
-        print('CITY: ', actual_cities)
-
-    # PREREQUISITE & ATAR
-    rank_head = soup.find('th', class_='course-details-table__th', text=re.compile('Selection Rank', re.IGNORECASE))
-    if rank_head:
-        remarks_list = []
-        atar = rank_head.find_next('td', class_='course-details-table__td').text
-        atar_val = re.search(r'\d+', atar.__str__().strip())
-        if atar_val != None:
-            atar_val = atar_val.group()
-            course_data['Prerequisite_1_grade'] = atar_val
-            course_data['Prerequisite_1'] = 'year 12'
-        else:
-            atar_val = 'Not Available'
-            course_data['Prerequisite_1_grade'] = atar_val
-            course_data['Prerequisite_1'] = 'year 12'
-            remarks_list.append('The university did not announce the selection rank(ATAR) yet')
-            course_data['Remarks'] = remarks_list
-        print('ATAR: ', course_data['Prerequisite_1_grade'])
-
+        course_data['Availability'] = 'A'
+    print('CITY: ', actual_cities)
 
     # CAREER OPPORTUNITIES
     career_title = soup.find('h2', text=re.compile('Career opportunities', re.IGNORECASE))
@@ -190,38 +183,37 @@ for each_url in course_links_file:
         print('LOCAL FEES: ', course_data['Local_Fees'])
         print('INTERNATIONAL FEES: ', course_data['Int_Fees'])
 
-    # DURATION & DURATION TIME
-    # navigate to "important to know" tab
-    try:
-        browser.execute_script("arguments[0].click();", WebDriverWait(browser, 5).until(
-            EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, 'Important to know'))))
-    except TimeoutException:
-        print('Timeout Exception')
-        pass
-    # grab the data
-    duration_title = soup.find('h2', class_='h4 blue', text=re.compile('Course Duration', re.IGNORECASE))
-    if duration_title:
-        duration_text = duration_title.find_next('p')
-        if duration_text:
-            first_part = duration_text.get_text().__str__().split('.')[0]
-            if first_part is not None:
-                if DurationConverter.convert_duration(first_part) is not None:
-                    converted_first_part = list(DurationConverter.convert_duration(first_part))
-                    course_data['Duration'] = converted_first_part[0]
-                    if converted_first_part[0] == 1 and 'Years' in converted_first_part[1]:
-                        converted_first_part[1] = 'Year'
-                        course_data['Duration_Time'] = converted_first_part[1]
-                    elif converted_first_part[0] == 1 and 'Months' in converted_first_part[1]:
-                        converted_first_part[1] = 'Month'
-                        course_data['Duration_Time'] = converted_first_part[1]
+        # DURATION & DURATION TIME
+        # navigate to "important to know" tab
+        try:
+            browser.execute_script("arguments[0].click();", WebDriverWait(browser, 5).until(
+                EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, 'Important to know'))))
+        except TimeoutException:
+            print('Timeout Exception')
+            pass
+        # grab the data
+        duration_title = soup.find('h2', class_='h4 blue', text=re.compile('Course Duration', re.IGNORECASE))
+        if duration_title:
+            duration_text = duration_title.find_next('p')
+            if duration_text:
+                first_part = duration_text.get_text().__str__().split('.')[0]
+                if first_part is not None:
+                    if DurationConverter.convert_duration(first_part) is not None:
+                        converted_first_part = list(DurationConverter.convert_duration(first_part))
+                        course_data['Duration'] = converted_first_part[0]
+                        if converted_first_part[0] == 1 and 'Years' in converted_first_part[1]:
+                            converted_first_part[1] = 'Year'
+                            course_data['Duration_Time'] = converted_first_part[1]
+                        elif converted_first_part[0] == 1 and 'Months' in converted_first_part[1]:
+                            converted_first_part[1] = 'Month'
+                            course_data['Duration_Time'] = converted_first_part[1]
+                        else:
+                            course_data['Duration_Time'] = converted_first_part[1]
                     else:
-                        course_data['Duration_Time'] = converted_first_part[1]
-                else:
-                    course_data['Duration'] = 'not specified'
-                    course_data['Duration_Time'] = 'not specified'
-    print('DURATION: ', course_data['Duration'])
-    print('DURATION TIME: ', course_data['Duration_Time'])
-
+                        course_data['Duration'] = 'not specified'
+                        course_data['Duration_Time'] = 'not specified'
+        print('DURATION: ', course_data['Duration'])
+        print('DURATION TIME: ', course_data['Duration_Time'])
 
     # DELIVERY (online, offline, face-to-face, blended, distance)
     # navigate to "Unit Delivery Modes" tab
@@ -267,7 +259,8 @@ for each_url in course_links_file:
                                 else:
                                     course_data['Distance'] = 'no'
     print('DELIVERY: online: ' + course_data['Online'] + ' offline: ' + course_data['Offline'] + ' face to face: ' +
-          course_data['Face_to_Face'] + ' blended: ' + course_data['Blended'] + ' distance: ' + course_data['Distance'])
+          course_data['Face_to_Face'] + ' blended: ' + course_data['Blended'] + ' distance: ' + course_data[
+              'Distance'])
 
     # duplicating entries with multiple cities for each city and mapping the corresponding country
     for i in actual_cities:
@@ -275,7 +268,7 @@ for each_url in course_links_file:
         course_data['Country'] = possible_countries[i]
         course_data_all.append(copy.deepcopy(course_data))
     del actual_cities
-    del remarks_list
+
     # TABULATE THE DATA
     desired_order_list = ['Level_Code', 'University', 'City', 'Course', 'Faculty', 'Int_Fees', 'Local_Fees',
                           'Currency', 'Currency_Time', 'Duration', 'Duration_Time', 'Full_Time', 'Part_Time',
@@ -291,7 +284,7 @@ for each_url in course_links_file:
         dict_writer.writeheader()
         dict_writer.writerows(course_data_all)
 
-    with open(csv_file, 'r', encoding='utf-8') as infile, open('UC_bachelors_ordered.csv', 'w', encoding='utf-8',
+    with open(csv_file, 'r', encoding='utf-8') as infile, open('UC_postgrad_ordered.csv', 'w', encoding='utf-8',
                                                                newline='') as outfile:
         writer = csv.DictWriter(outfile, fieldnames=desired_order_list)
         # reorder the header first
@@ -299,7 +292,4 @@ for each_url in course_links_file:
         for row in csv.DictReader(infile):
             # writes the reordered rows to the new file
             writer.writerow(row)
-
-
-
 
