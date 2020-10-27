@@ -98,9 +98,23 @@ for each_url in course_links_file:
 
     # CITY
     location_head = soup.find('th', class_='course-details-table__th', text=re.compile('Location', re.IGNORECASE))
+    temp_city = []
     if location_head:
         cities = location_head.find_next('td', class_='course-details-table__td').text
-        actual_cities.append(cities.__str__().strip().lower())
+        temp_city = re.findall(r"[\w']+", cities.__str__().strip().lower())
+        if 'canberra' in temp_city:
+            actual_cities.append('canberra')
+        if 'bruce' in temp_city or 'bruceuci' in temp_city:
+            actual_cities.append('bruce')
+        if 'mumbai' in temp_city:
+            actual_cities.append('mumbai')
+        if 'melbourne' in temp_city:
+            actual_cities.append('melbourne')
+        if 'brisbane' in temp_city:
+            actual_cities.append('brisbane')
+        if 'sydney' in temp_city:
+            actual_cities.append('sydney')
+
         print('CITY: ', actual_cities)
 
     # PREREQUISITE & ATAR
@@ -222,7 +236,6 @@ for each_url in course_links_file:
                                     course_data['Distance'] = 'no'
     print('DELIVERY: online: ' + course_data['Online'] + ' offline: ' + course_data['Offline'] + ' face to face: ' +
           course_data['Face_to_Face'] + ' blended: ' + course_data['Blended'] + ' distance: ' + course_data['Distance'])
-
 
 
 
